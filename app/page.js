@@ -1,20 +1,50 @@
-"use client"
+"use client";
 
-import Image from "next/image";
-import Logo from "@/components/Logo";
+import Boot from "@/components/Boot";
+import LockScreen from "@/components/LockScreen";
+import Desktop from "@/components/Desktop";
 import { useState } from "react";
+import useDisableContextMenu from "./hooks/useDisableContextMenu";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Home() {
+  useDisableContextMenu();
+
   const [showLogin, setShowLogin] = useState(false);
+  const [currentScreen, setCurrentScreen] = useState("lockscreen");
   return (
-    <div className="bg-black min-h-screen flex items-center justify-center">
-      {!showLogin ? <Logo setShowLogin={setShowLogin} /> : 
-      <div>
-      <Image className="absolute" src="/forest.jpg" alt="Flower Ground" fill={true} />
-      <div>
-        
-      </div>
-      </div>}
+    <div className="relative w-screen h-screen overflow-hidden bg-black">
+      {!showLogin ? (
+        <div className="flex w-full h-full items-center justify-center">
+          <Boot setShowLogin={setShowLogin} />
+        </div>
+      ) : (
+        <AnimatePresence mode="wait">
+          {currentScreen === "lockscreen" ? (
+            <motion.div
+              className="absolute inset-0 w-full h-full"
+              key="lock"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LockScreen setCurrentScreen={setCurrentScreen} />
+            </motion.div>
+          ) : (
+            <motion.div
+              className="absolute inset-0 w-full h-full"
+              key="desktop"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Desktop />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
     </div>
   );
 }

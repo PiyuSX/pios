@@ -3,7 +3,6 @@
 
 import { useEffect, useRef } from "react"
 import { animate, motion, useInView, useMotionValue, useReducedMotion, useTransform } from "motion/react"
-import Image from "next/image"
 
 
 const COLORS = ["#7868e6", "#36b9d8", "#a78bfa", "#e0e7ff", "#5271ff"]
@@ -18,7 +17,7 @@ const revealEase = (t) =>
   function createGradient(position) {
     const start = position - BAND_SIZE
     const end = position + BAND_SIZE
-    const base = "var(--foreground)"
+    const base = "#ffffff"
 
     if (start >= 100) {
       return `linear-gradient(90deg, ${base}, ${base})`
@@ -102,7 +101,7 @@ const Logo = ({setShowLogin}) => {
        
         <motion.span
         ref={textRef}
-        className="inline-block align-bottom leading-[100%] text-inherit font-bold text-2xl "
+        className="inline-block align-bottom leading-[100%] font-bold text-2xl "
         style={{
           transform: "translateY(-1px)",
           opacity,
