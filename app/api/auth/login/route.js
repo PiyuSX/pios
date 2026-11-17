@@ -6,8 +6,8 @@ import { SignJWT } from "jose"
 import { cookies } from "next/headers"
 
 const loginSchema = z.object({
-    username: z.string().min(3, "Username must be at least 3 char long"),
-    password: z.string().min(8, "Password must be at least 8 char long")
+    username: z.string().min(3, "Username must be at least 3 characters long").max(20, "Username must be under 20 characters long"),
+    password: z.string().min(8, "Password must be at least 8 characters long")
 })
 
 export async function POST(req) {
