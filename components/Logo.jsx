@@ -63,6 +63,7 @@ const Logo = ({setShowLogin}) => {
         position.set(END)
         opacity.set(1)
         letterSpacing.set("0em")
+        setShowLogin(true)
         return
       }
 
@@ -83,7 +84,12 @@ const Logo = ({setShowLogin}) => {
         duration: 3,
         ease: "easeInOut"
       })
-      
+
+      spacing.then(() => {
+        setShowLogin(true)
+      })
+
+
 
       return () => {
         sweep.stop()
