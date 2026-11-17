@@ -1,12 +1,23 @@
 @import "tailwindcss";
 
 
+
+
+body {
+    -webkit-touch-callout: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+
+
 :root {
     color-scheme: light;
 
     --background: #ffffff;
     --foreground: #09090b;
     --muted: #71717a;
+
 
 }
 
@@ -25,3 +36,5 @@
     --color-foreground: var(--foreground);
     --color-muted: var(--muted);
 }
+
+
