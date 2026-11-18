@@ -120,7 +120,7 @@ const useDesktopStore = create(
                 const newItem = {
                     id: crypto.randomUUID(),
                     filename,
-                    icon: type === "folder" ? "/folder,svg" : `/${type}.svg`,
+                    icon: type === "folder" ? "/folder.svg" : `/${type}.svg`,
                     type,
                     isSystem: false,
                     row,
