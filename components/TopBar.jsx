@@ -2,7 +2,8 @@
 
 import BatteryStatus from "./BatteryStatus";
 import { FaGithub, FaLinkedinIn, FaInstagram, FaDiscord } from "react-icons/fa6";
-import VolumeStatus from "./VolumeStatus";
+import { IoLockClosed } from "react-icons/io5"
+// import VolumeStatus from "./VolumeStatus";
 
 const socials = [
     {name: "Github", href:"https://github.com/PiyuSX", icon: <FaGithub />},
@@ -11,7 +12,7 @@ const socials = [
     {name: "Discord", href:"https://discord.com/users/932975786997219368", icon: <FaDiscord />}
 ]
 
-const TopBar = () => {
+const TopBar = ({setCurrentScreen}) => {
   return (
     <div className="w-screen bg-background/60 backdrop-blur-2xl backdrop-saturate-150 border-b border-foreground/10 text-foreground flex items-center justify-between px-4">
         <div className="flex text-sm gap-3 font-medium ">
@@ -27,7 +28,13 @@ const TopBar = () => {
         </div>
         <div className="flex gap-2 items-center">
         <BatteryStatus />
-        <VolumeStatus />
+        {/* <VolumeStatus /> */}
+        <div onClick={() => setCurrentScreen("lockscreen")} className="cursor-pointer relative group">
+        <IoLockClosed />
+        <div className="absolute hidden group-hover:block top-full right-0 mt-1 p-2 bg-foreground/60 backdrop-blur-2xl text-background text-xs rounded z-50 whitespace-nowrap">
+          <p>Lock Screen</p>
+        </div>
+        </div>
         </div>
     </div>
   )
