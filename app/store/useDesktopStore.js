@@ -19,6 +19,69 @@ const defaultItems = [
         isSystem: true,
         row: 1,
         col: 0
+    },
+    {
+        id: "test-folder",
+        filename: "Projects",
+        icon: "/folder.svg",
+        type: "folder",
+        isSystem: false,
+        row: 2,
+        col: 0
+    },
+    {
+        id: "test-file-1",
+        filename: "README",
+        icon: "/document.svg",
+        type: "file",
+        isSystem: false,
+        row: 3,
+        col: 0
+    },
+    {
+        id: "test-file-2",
+        filename: "Portfolio",
+        icon: "/document.svg",
+        type: "file",
+        isSystem: false,
+        row: 0,
+        col: 1
+    },
+    {
+        id: "test-folder-2",
+        filename: "Images",
+        icon: "/folder.svg",
+        type: "folder",
+        isSystem: false,
+        row: 1,
+        col: 1
+    },
+    {
+        id: "test-file-3",
+        filename: "Right Edge",
+        icon: "/document.svg",
+        type: "file",
+        isSystem: false,
+        row: 0,
+        col: 18
+    },
+    {
+        id: "test-folder-3",
+        filename: "Bottom Edge",
+        icon: "/folder.svg",
+        type: "folder",
+        isSystem: false,
+        row: 9,
+        col: 0
+    },
+    {
+        id: "test-folder-4",
+        filename: "Bottom Right",
+        icon: "/folder.svg",
+        type: "folder",
+        isSystem: false,
+        row: 9,
+        col: 18
     }
 ]
 
@@ -57,16 +120,16 @@ const useDesktopStore = create(
                 const newItem = {
                     id: crypto.randomUUID(),
                     filename,
-                    icon: type === "folder" ? "/folder,svg" : `${type}.svg`,
+                    icon: type === "folder" ? "/folder,svg" : `/${type}.svg`,
                     type,
                     isSystem: false,
                     row,
                     col
                 }
 
-                set((state) => {
+                set((state) => ({
                     desktopItems: [...state.desktopItems, newItem]
-                })
+                }))
 
             },
 
@@ -101,6 +164,57 @@ const useDesktopStore = create(
 
             },
 
+            validatePosition: (rows, cols) => {
+                const items = get().desktopItems
+
+                const occupied = new Set()
+
+                const updatedItems = items.map((item) => {
+                    const key = `${item.row}-${item.col}`
+
+                    if (
+                        item.row >= 0 &&
+                        item.row < rows &&
+                        item.col >= 0 &&
+                        item.col < cols &&
+                        !occupied.has(key)
+
+                    ) {
+                        occupied.add(key)
+
+                        return item
+                    }
+
+                    //Finding next avi position
+
+                    let found = false
+
+                    for (let c = 0; c < cols && !found; c++) {
+                        for (let r = 0; r < rows; r++) {
+                            const newKey = `${r}-${c}`
+
+                            if (!occupied.has(newKey)) {
+                                occupied.add(newKey)
+
+                                found = true
+
+                                return { ...item, row: r, col: c}
+                            }
+
+
+                        }
+                    }
+                    // Incase of no avi postion
+
+                    return item
+                }
+                
+            )
+
+            set({ desktopItems: updatedItems })
+        
+        },
+
             //Restore default icons
             resetDesktop: () => set({ desktopItems: defaultItems })
 
@@ -114,6 +228,7 @@ const useDesktopStore = create(
 
     )
 )
+
 
 
 export default useDesktopStore

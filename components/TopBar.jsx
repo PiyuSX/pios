@@ -3,7 +3,7 @@
 import BatteryStatus from "./BatteryStatus";
 import { FaGithub, FaLinkedinIn, FaInstagram, FaDiscord } from "react-icons/fa6";
 import { IoLockClosed } from "react-icons/io5"
-// import VolumeStatus from "./VolumeStatus";
+import useTime from "@/app/hooks/useTime";
 
 const socials = [
     {name: "Github", href:"https://github.com/PiyuSX", icon: <FaGithub />},
@@ -13,20 +13,25 @@ const socials = [
 ]
 
 const TopBar = ({setCurrentScreen}) => {
+  const { time, date } = useTime()
   return (
-    <div className="w-screen bg-background/60 backdrop-blur-2xl backdrop-saturate-150 border-b border-foreground/10 text-foreground flex items-center justify-between px-4">
-        <div className="flex text-sm gap-3 font-medium ">
+    <div className="w-screen bg-background/60 backdrop-blur-2xl backdrop-saturate-150 border-b border-foreground/10 text-foreground grid grid-cols-[1fr_auto_1fr] items-center px-4">
+        <div className="flex text-sm gap-3 font-medium justify-start items-center">
           <p>PiOS</p>
           <p>@Piyusx</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 justify-center items-center">
          {socials.map((social) => (
             <a className="transition-transform duration-200 hover:scale-125" key={social.name} href={social.href} target="_blank" rel="noopener noreferrer">
               {social.icon}
             </a>
          ))}
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center justify-end">
+          <div className="flex items-center gap-2 font-light text-sm text-foreground mr-6">
+            <p>{time}</p>
+            <p>{date}</p>
+          </div>
         <BatteryStatus />
         {/* <VolumeStatus /> */}
         <div onClick={() => setCurrentScreen("lockscreen")} className="cursor-pointer relative group">
