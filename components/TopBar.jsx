@@ -2,6 +2,7 @@
 
 import BatteryStatus from "./BatteryStatus";
 import { FaGithub, FaLinkedinIn, FaInstagram, FaDiscord } from "react-icons/fa6";
+import VolumeStatus from "./VolumeStatus";
 
 const socials = [
     {name: "Github", href:"https://github.com/PiyuSX", icon: <FaGithub />},
@@ -24,8 +25,9 @@ const TopBar = () => {
             </a>
          ))}
         </div>
-        <div>
+        <div className="flex gap-2 items-center">
         <BatteryStatus />
+        <VolumeStatus />
         </div>
     </div>
   )
