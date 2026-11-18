@@ -48,7 +48,7 @@ export default function BatteryStatus() {
       : "currentColor";
 
   return (
-    <div className="p-1 text-foreground">
+    <div className="p-1 text-foreground relative group">
       <svg
         width="27"
         height="13"
@@ -89,6 +89,10 @@ export default function BatteryStatus() {
           />
         )}
       </svg>
+      <div className="absolute hidden group-hover:block top-full right-0 mt-1 p-2 bg-foreground/60 backdrop-blur-2xl text-background text-xs rounded z-50 whitespace-nowrap">
+        {level}% {charging ? "(Charging)" : "Remaning"}
+      </div>
+
     </div>
   );
 }
