@@ -3,20 +3,30 @@
 import Boot from "@/components/Boot";
 import LockScreen from "@/components/LockScreen";
 import Desktop from "@/components/Desktop";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useDisableContextMenu from "./hooks/useDisableContextMenu";
 import { AnimatePresence, motion } from "framer-motion";
+import useHasSeenBoot from "./store/useBootStore";
 
 export default function Home() {
   useDisableContextMenu();
 
-  const [showLogin, setShowLogin] = useState(false);
+  const { hasSeenBoot, setHasSeenBoot } = useHasSeenBoot()
   const [currentScreen, setCurrentScreen] = useState("lockscreen");
+
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  if (!mounted) {
+    return <LockScreen />
+  }
+
+
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-black">
-      {!showLogin ? (
+      {!hasSeenBoot ? (
         <div className="flex w-full h-full items-center justify-center">
-          <Boot setShowLogin={setShowLogin} />
+          <Boot setHasSeenBoot={setHasSeenBoot} />
         </div>
       ) : (
         <AnimatePresence mode="wait">

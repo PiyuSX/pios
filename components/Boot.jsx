@@ -45,7 +45,7 @@ const revealEase = (t) =>
     return `linear-gradient(90deg, ${stops.join(", ")})`
   }
 
-const Logo = ({setShowLogin}) => {
+const Logo = ({ setHasSeenBoot }) => {
     const letterSpacing = useMotionValue("10em")
 
     const textRef = useRef(null)
@@ -62,7 +62,7 @@ const Logo = ({setShowLogin}) => {
         position.set(END)
         opacity.set(1)
         letterSpacing.set("0em")
-        setShowLogin(true)
+        setHasSeenBoot(true)
         return
       }
 
@@ -85,7 +85,7 @@ const Logo = ({setShowLogin}) => {
       })
 
       spacing.then(() => {
-        setShowLogin(true)
+        setHasSeenBoot(true)
       })
 
 
