@@ -8,16 +8,16 @@ const LockScreen = ({ setCurrentScreen }) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Enter") {
-        setCurrentScreen("desktop");
+        setCurrentScreen("desktop")
       }
-    };
+    }
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown)
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [setCurrentScreen]);
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [setCurrentScreen])
 
   return (
     <div className="relative w-full h-full min-h-screen overflow-hidden text-white">
