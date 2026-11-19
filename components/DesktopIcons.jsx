@@ -137,7 +137,8 @@ const DesktopIcons = () => {
       id: item.id,
       pointerId: e.pointerId,
       offsetX: e.clientX - rect.left,
-      offsetY: e.clientX - rect.top,
+      offsetY: e.clientY - rect.top,
+      
       left: rect.left - desktopRect.left,
       top: rect.top - desktopRect.top,
       startX: e.clientX,
