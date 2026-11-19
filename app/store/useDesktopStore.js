@@ -2,86 +2,185 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 const defaultItems = [
-    {
-        id: "system-files",
-        filename: "Files",
+           {
+        id: "test-folder-5",
+        filename: "Documents",
         icon: "/folder.svg",
         type: "folder",
-        isSystem: true,
-        row: 0,
+        isSystem: false,
+        row: 4,
         col: 0
     },
     {
-        id: "system-text",
-        filename: "Text",
+        id: "test-file-4",
+        filename: "Notes",
         icon: "/document.svg",
         type: "file",
-        isSystem: true,
-        row: 1,
+        isSystem: false,
+        row: 5,
         col: 0
     },
     {
-        id: "test-folder",
-        filename: "Projects",
+        id: "test-folder-6",
+        filename: "Downloads",
+        icon: "/folder.svg",
+        type: "folder",
+        isSystem: false,
+        row: 6,
+        col: 0
+    },
+    {
+        id: "test-file-5",
+        filename: "Resume",
+        icon: "/document.svg",
+        type: "file",
+        isSystem: false,
+        row: 7,
+        col: 0
+    },
+    {
+        id: "test-file-6",
+        filename: "Budget",
+        icon: "/document.svg",
+        type: "file",
+        isSystem: false,
+        row: 8,
+        col: 0
+    },
+    {
+        id: "test-folder-7",
+        filename: "Music",
         icon: "/folder.svg",
         type: "folder",
         isSystem: false,
         row: 2,
-        col: 0
+        col: 1
     },
     {
-        id: "test-file-1",
-        filename: "README",
+        id: "test-file-7",
+        filename: "Todo",
         icon: "/document.svg",
         type: "file",
         isSystem: false,
         row: 3,
-        col: 0
-    },
-    {
-        id: "test-file-2",
-        filename: "Portfolio",
-        icon: "/document.svg",
-        type: "file",
-        isSystem: false,
-        row: 0,
         col: 1
     },
     {
-        id: "test-folder-2",
-        filename: "Images",
+        id: "test-folder-8",
+        filename: "Videos",
         icon: "/folder.svg",
         type: "folder",
+        isSystem: false,
+        row: 4,
+        col: 1
+    },
+    {
+        id: "test-file-8",
+        filename: "Changelog",
+        icon: "/document.svg",
+        type: "file",
+        isSystem: false,
+        row: 5,
+        col: 1
+    },
+    {
+        id: "test-folder-9",
+        filename: "Archive",
+        icon: "/folder.svg",
+        type: "folder",
+        isSystem: false,
+        row: 6,
+        col: 1
+    },
+    {
+        id: "test-file-9",
+        filename: "Invoices",
+        icon: "/document.svg",
+        type: "file",
+        isSystem: false,
+        row: 7,
+        col: 1
+    },
+    {
+        id: "test-folder-10",
+        filename: "Backups",
+        icon: "/folder.svg",
+        type: "folder",
+        isSystem: false,
+        row: 8,
+        col: 1
+    },
+    {
+        id: "test-file-10",
+        filename: "Contracts",
+        icon: "/document.svg",
+        type: "file",
+        isSystem: false,
+        row: 9,
+        col: 1
+    },
+    {
+        id: "test-folder-11",
+        filename: "Photos",
+        icon: "/folder.svg",
+        type: "folder",
+        isSystem: false,
+        row: 0,
+        col: 2
+    },
+    {
+        id: "test-file-11",
+        filename: "Ideas",
+        icon: "/document.svg",
+        type: "file",
         isSystem: false,
         row: 1,
-        col: 1
+        col: 2
     },
     {
-        id: "test-file-3",
-        filename: "Right Edge",
+        id: "test-folder-12",
+        filename: "Work",
+        icon: "/folder.svg",
+        type: "folder",
+        isSystem: false,
+        row: 2,
+        col: 2
+    },
+    {
+        id: "test-file-12",
+        filename: "Meeting Notes",
         icon: "/document.svg",
         type: "file",
         isSystem: false,
-        row: 0,
-        col: 18
+        row: 3,
+        col: 2
     },
     {
-        id: "test-folder-3",
-        filename: "Bottom Edge",
+        id: "test-folder-13",
+        filename: "Personal",
         icon: "/folder.svg",
         type: "folder",
         isSystem: false,
-        row: 9,
-        col: 0
+        row: 4,
+        col: 2
     },
     {
-        id: "test-folder-4",
-        filename: "Bottom Right",
+        id: "test-file-13",
+        filename: "Schedule",
+        icon: "/document.svg",
+        type: "file",
+        isSystem: false,
+        row: 5,
+        col: 2
+    },
+    {
+        id: "test-folder-14",
+        filename: "Templates",
         icon: "/folder.svg",
         type: "folder",
         isSystem: false,
-        row: 9,
-        col: 18
+        row: 6,
+        col: 2
     }
 ]
 
@@ -162,6 +261,50 @@ const useDesktopStore = create(
                 }))
 
 
+            },
+
+            moveItems: (moves, visibleItems) =>{
+
+                const movingIds = new Set(moves.map((move) => move.id))
+                const targetCells = new Set()
+
+                for (const move of moves) {
+                    if (
+                        !Number.isInteger(move.row) ||
+                        !Number.isInteger(move.col) ||
+                        move.row < 0 ||
+                        move.col < 0
+                    ) return
+
+                    const key = `${move.row}-${move.col}`
+
+                    if (targetCells.has(key)) return
+
+                    targetCells.add(key)
+                } 
+                
+
+                const occupied = visibleItems.some((item) => {
+                    if (movingIds.has(item.id)) return false
+
+                    return moves.some(
+                        (move) => 
+                            move.row === item.displayRow &&
+                            move.col === item.displayCol
+                    )
+                })
+
+                if (occupied) return
+
+                const moveMap = new Map(moves.map((move) => [move.id, move]))
+
+                set((state) => ({
+                    desktopItems: state.desktopItems.map((item) => {
+                        const move = moveMap.get(item.id)
+
+                        return move ? { ...item, row:move.row, col: move.col } : item
+                    })
+                }))
             },
 
             validatePosition: (rows, cols) => {

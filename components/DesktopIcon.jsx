@@ -3,10 +3,6 @@ import Image from "next/image"
 const DesktopIcon = ({ item, selected, onSelect }) => {
   return (
     <div
-    onClick={(e) => {
-      e.stopPropagation()
-      onSelect(item.id, e.ctrlKey)
-    }}
     className={`flex w-22.5 flex-col items-center gap-2 cursor-pointer select-none rounded-xl p-1 
       ${selected ? "bg-white/20 ring-1 ring-white/30" : "hover:bg-white/10"}
     `}>
@@ -19,3 +15,4 @@ const DesktopIcon = ({ item, selected, onSelect }) => {
 }
 
 export default DesktopIcon
+
