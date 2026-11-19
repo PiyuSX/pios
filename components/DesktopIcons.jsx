@@ -10,15 +10,15 @@ const MIN_CELL_HEIGHT = 90;
 const DesktopIcons = () => {
   const desktopItems = useDesktopStore((state) => state.desktopItems);
 
-  const moveItem = useDesktopStore((state) => state.moveItem)
+  const moveItems = useDesktopStore((state) => state.moveItems);
 
-  const [drag, setDrag] = useState(null)
+  const [drag, setDrag] = useState(null);
 
-  const dragStart = useRef(null)
+  const dragStart = useRef(null);
 
-  const supressClick = useRef(false)
+  const supressClick = useRef(false);
 
-//   const validatePosition = useDesktopStore((state) => state.validatePosition);
+  //   const validatePosition = useDesktopStore((state) => state.validatePosition);
 
   const desktopRef = useRef(null);
 
@@ -29,58 +29,58 @@ const DesktopIcons = () => {
     cellHeight: 0,
   });
 
-  const [selectedId, setSelectedId] = useState([])
+  const [selectedId, setSelectedId] = useState([]);
 
-  const displayItems  = (() => {
-    if (!grid.rows || !grid.cols) return []
+  const displayItems = (() => {
+    if (!grid.rows || !grid.cols) return [];
 
-    const occupied = new Set()
-    const positions = []
+    const occupied = new Set();
+    const positions = [];
 
     desktopItems.forEach((item) => {
-        if (
-            item.row >= 0 &&
-            item.row < grid.rows &&
-            item.col >= 0 &&
-            item.col < grid.cols
-        ) {
-            const key = `${item.row}-${item.col}`
+      if (
+        item.row >= 0 &&
+        item.row < grid.rows &&
+        item.col >= 0 &&
+        item.col < grid.cols
+      ) {
+        const key = `${item.row}-${item.col}`;
 
-            if (!occupied.has(key)) {
-                occupied.add(key)
-                positions.push({
-                    ...item,
-                    displayRow: item.row,
-                    displayCol: item.col
-                })
-                return
-            }
+        if (!occupied.has(key)) {
+          occupied.add(key);
+          positions.push({
+            ...item,
+            displayRow: item.row,
+            displayCol: item.col,
+          });
+          return;
         }
+      }
 
-        positions.push({...item, displayRow: -1, displayCol: -1})
-    })
+      positions.push({ ...item, displayRow: -1, displayCol: -1 });
+    });
 
-    //relocate that dont fit 
+    //relocate that dont fit
 
     positions.forEach((item) => {
-        if (item.displayRow !== -1) return
+      if (item.displayRow !== -1) return;
 
-        for (let col = 0; col < grid.cols; col++) {
-            for (let row = 0; row < grid.rows; row++) {
-                const key = `${row}-${col}`;
+      for (let col = 0; col < grid.cols; col++) {
+        for (let row = 0; row < grid.rows; row++) {
+          const key = `${row}-${col}`;
 
-                if (!occupied.has(key)) {
-                    occupied.add(key)
-                    item.displayRow = row
-                    item.displayCol = col
-                    return
-                }
-            }
+          if (!occupied.has(key)) {
+            occupied.add(key);
+            item.displayRow = row;
+            item.displayCol = col;
+            return;
+          }
         }
-    })
+      }
+    });
 
-    return positions
-  }) ()
+    return positions;
+  })();
 
   useEffect(() => {
     const desktop = desktopRef.current;
@@ -98,11 +98,6 @@ const DesktopIcons = () => {
         cellWidth: width / cols,
         cellHeight: height / rows,
       });
-
-      console.log("Workspace:", width, height);
-      console.log("Columns:", cols);
-      console.log("Rows:", rows);
-      console.log("Total cells:", rows * cols);
     });
 
     observer.observe(desktop);
@@ -110,116 +105,154 @@ const DesktopIcons = () => {
     return () => observer.disconnect();
   }, []);
 
-
   const handleSelect = (id, multiSelect) => {
     if (supressClick.current) {
-      supressClick.current = false
-      return
+      supressClick.current = false;
+      return;
     }
     if (multiSelect) {
-      setSelectedId((prev) => prev.includes(id) ? 
-      prev.filter((itemId) => itemId !== id) : [...prev, id])
+      setSelectedId((prev) =>
+        prev.includes(id)
+          ? prev.filter((itemId) => itemId !== id)
+          : [...prev, id],
+      );
     } else {
-      setSelectedId([id])
+      setSelectedId([id]);
     }
-  }
-
+  };
 
   const handleDragStart = (e, item) => {
-    if (e.button !== 0) return
+    if (e.button !== 0) return;
 
-    supressClick.current = false
+    supressClick.current = false;
 
-    const rect = e.currentTarget.getBoundingClientRect()
-    const desktopRect = desktopRef.current.getBoundingClientRect()
+    const rect = e.currentTarget.getBoundingClientRect();
+    const desktopRect = desktopRef.current.getBoundingClientRect();
+
+    const group = selectedId.includes(item.id)
+      ? displayItems.filter((i) => selectedId.includes(i.id))
+      : [item];
 
     const start = {
       id: item.id,
       pointerId: e.pointerId,
-      offsetX: e.clientX - rect.left,
-      offsetY: e.clientY - rect.top,
-      
-      left: rect.left - desktopRect.left,
-      top: rect.top - desktopRect.top,
+      initialLeft: rect.left - desktopRect.left,
+      initialTop: rect.top - desktopRect.top,
+
       startX: e.clientX,
       startY: e.clientY,
-      moved: false
-    }
+      anchorRow: item.displayRow,
+      anchorCol: item.displayCol,
 
-    dragStart.current = start
+      group: group.map((i) => ({
+        id: i.id,
+        row: i.displayRow,
+        col: i.displayCol,
+      })),
 
-    e.currentTarget.setPointerCapture(e.pointerId)
-  }
+      wasSelected: selectedId.includes(item.id),
+      deltaX: 0,
+      deltaY: 0,
+      moved: false,
+    };
 
+    dragStart.current = start;
+
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
 
   const handleDragMove = (e) => {
-    const start = dragStart.current
-    if (!start || start.pointerId !== e.pointerId) return
+    const start = dragStart.current;
+    if (!start || start.pointerId !== e.pointerId) return;
 
-    const distance = Math.hypot(
-      e.clientX - start.startX,
-      e.clientY - start.startY
-    )
+    const deltaX = e.clientX - start.startX;
+    const deltaY = e.clientY - start.startY;
+
+    const distance = Math.hypot(deltaX, deltaY);
 
     // Ignoring small movement
 
-    if (distance < 5 && !start.moved) return
+    if (distance < 5 && !start.moved) return;
 
-    start.moved = true
-    const desktopRect = desktopRef.current.getBoundingClientRect()
+    if (!start.moved && !start.wasSelected) {
+      setSelectedId([start.id]);
+    }
 
-    start.left = e.clientX - desktopRect.left - start.offsetX
-    start.top = e.clientY - desktopRect.top - start.offsetY
+    start.moved = true;
+    start.deltaX = deltaX;
+    start.deltaY = deltaY;
 
     setDrag({
       id: start.id,
-      left: start.left,
-      top: start.top
-    })
-  }
-  
+      ids: start.group.map((item) => item.id),
+      group: start.group,
+      deltaX,
+      deltaY,
+    });
+  };
 
   const handleDragEnd = (e) => {
-    const start = dragStart.current
+    const start = dragStart.current;
 
-    if (!start || start.pointerId !== e.pointerId) return
+    if (!start || start.pointerId !== e.pointerId) return;
 
     if (start.moved) {
-      const col = Math.max(
-        0, Math.min(grid.cols - 1, Math.round(start.left / grid.cellWidth))
+      const minCol = Math.min(...start.group.map((item) => item.col));
+      const maxCol = Math.max(...start.group.map((item) => item.col));
 
-      )
+      const minRow = Math.min(...start.group.map((item) => item.row));
+      const maxRow = Math.max(...start.group.map((item) => item.row));
 
-      const row = Math.max(
-        0, Math.min(grid.rows - 1, Math.round(start.top / grid.cellHeight))
-      )
+      const minAllowedCol = start.anchorCol - minCol;
+      const maxAllowedCol = grid.cols - 1 - (maxCol - start.anchorCol);
 
-      const occupied = displayItems.some(
-        (item) => 
-          item.id !== start.id &&
-          item.displayCol === col &&
-          item.displayRow === row
-      )
+      const minAllowedRow = start.anchorRow - minRow;
+      const maxAllowedRow = grid.rows - 1 - (maxRow - start.anchorRow);
 
-      if (!occupied) {
-        moveItem(start.id, row, col)
-      }
+      const targetCol = Math.max(
+        minAllowedCol,
+        Math.min(
+          maxAllowedCol,
+          start.anchorCol + Math.round(start.deltaX / grid.cellWidth),
+        ),
+      );
 
-      supressClick.current = true
+      const targetRow = Math.max(
+        minAllowedRow,
+        Math.min(
+          maxAllowedRow,
+          start.anchorRow + Math.round(start.deltaY / grid.cellHeight),
+        ),
+      );
+
+      const colShift = targetCol - start.anchorCol;
+      const rowShift = targetRow - start.anchorRow;
+
+      const moves = start.group.map((item) => ({
+        id: item.id,
+        row: item.row + rowShift,
+        col: item.col + colShift,
+      }));
+
+      moveItems(moves, displayItems);
+
+      supressClick.current = true;
     }
 
-    dragStart.current = null
-    setDrag(null)
-  }
+    dragStart.current = null;
+    setDrag(null);
+  };
 
-//   useEffect(() => {
-//     if (!grid.rows || !grid.cols) return;
+  //   useEffect(() => {
+  //     if (!grid.rows || !grid.cols) return;
 
-//     validatePosition(grid.rows, grid.cols);
-//   }, [grid.rows, grid.cols, validatePosition]);
+  //     validatePosition(grid.rows, grid.cols);
+  //   }, [grid.rows, grid.cols, validatePosition]);
 
   return (
-    <div ref={desktopRef} className="absolute inset-0"
+    <div
+      ref={desktopRef}
+      className="absolute inset-0"
       onClick={() => setSelectedId([])}
     >
       {displayItems.map((item) => (
@@ -231,17 +264,31 @@ const DesktopIcons = () => {
           onPointerUp={handleDragEnd}
           onPointerCancel={handleDragEnd}
           style={{
-            left: drag?.id === item.id ? drag.left : item.displayCol * grid.cellWidth,
+            left: drag?.ids.includes(item.id)
+              ? drag.group.find((i) => i.id === item.id).col * grid.cellWidth +
+                drag.deltaX
+              : item.displayCol * grid.cellWidth,
 
-            top: drag?.id === item.id ? drag.top : item.displayRow * grid.cellHeight,
+            top: drag?.ids.includes(item.id)
+              ? drag.group.find((i) => i.id === item.id).row * grid.cellHeight +
+                drag.deltaY
+              : item.displayRow * grid.cellHeight,
 
             width: grid.cellWidth,
             height: grid.cellHeight,
-            zIndex: drag?.id === item.id ? 10 : 0,
-            touchAction: "none"
+            zIndex: drag?.ids.includes(item.id) ? 10 : 0,
+            touchAction: "none",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSelect(item.id, e.ctrlKey);
           }}
         >
-          <DesktopIcon item={item} selected={selectedId.includes(item.id)} onSelect={handleSelect} />
+          <DesktopIcon
+            item={item}
+            selected={selectedId.includes(item.id)}
+            onSelect={handleSelect}
+          />
         </div>
       ))}
     </div>
@@ -249,6 +296,3 @@ const DesktopIcons = () => {
 };
 
 export default DesktopIcons;
-
-
-
