@@ -1,5 +1,7 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { LuChevronRight, LuExternalLink } from "react-icons/lu"
 
 const menu = [
@@ -78,69 +80,170 @@ const menu = [
     }
 ]
 
-const DesktopContextMenu = ({ x, y, onClose, onAction }) => {
-    const renderItems = (items) => {
-        return items.map((item, index) => {
-            if (item.separator) {
-                return (
-                    <div key={index} className="my-1 border-t border-background/10" />
-                )
-            }
 
-            if (item.type === "submenu") {
-                return (
-                    <div key={index} className="relative group">
-                        <button className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-[12px] hover:bg-background/10">
-                            {item.label}
-                            <LuChevronRight size={14} className="opacity-60" />
-                        </button>
+const Submenu = ({ item, onClose, onAction }) => {
+    const [open, setOpen] = useState(false)
+    const [position, setPosition] = useState({ left: 0, top: 0})
 
-                        <div 
-                          className="absolute left-full top-0 ml-1 w-48 rounded-lg hidden border border-background/10 bg-background/10 p-1.5 shadow-xl backdrop-blur-2xl group-hover:block"
-                          >
-                            {renderItems(item.items)}
-                        </div>
+    const triggerRef = useRef(null)
+    const menuRef = useRef(null)
+    const closeTimer = useRef(null)
 
-                    </div>
-                )
-            }
-            
-            return (
-                <button
-                 key={index}
-                 className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-[12px] hover:bg-background/10"
-                 onClick={() => {
-                    if (item.type === "link") {
-                        window.open(item.href, "_blank", "noopener noreferrer")
-                        onClose()
-                        return
-                    }
-
-                    if (item.type === "action") {
-                        onAction?.(item.action)
-                        onClose()
-                    }
-                 }}
-                >
-                    {item.label}
-
-                    {item.type === "link" && (
-                        <LuExternalLink size={12} className="opacity/50" />
-                    )}
-
-                </button>
-            )
-        })
+    const cancelClose = () => {
+        clearTimeout(closeTimer.current)
     }
 
+    const scheduleClose = () => {
+        closeTimer.current = setTimeout(() => {
+            setOpen(false)
+        }, 180)
+    }
+
+    const openMenu = () => {
+        cancelClose()
+
+        const rect = triggerRef.current.getBoundingClientRect()
+
+        setPosition({
+            left: rect.right,
+            top: rect.top
+        })
+
+        setOpen(true)
+    }
+
+    //keeping the submuenu inside the viewport
+
+    useEffect(() => {
+        if (!open || !menuRef.current || !triggerRef.current) return
+
+        const triggerRect = triggerRef.current.getBoundingClientRect()
+
+        const menuRect = menuRef.current.getBoundingClientRect()
+
+        const left = triggerRect.right + menuRect.width > window.innerWidth
+            ? triggerRect.left - menuRect.width
+            : triggerRect.right
+
+        const top = Math.max(8, Math.min(triggerRect.top, window.innerHeight - menuRect.height - 8))
+
+        setPosition({ left, top })
+    }, [open])
+
+    useEffect(() => {
+        return () => clearTimeout(closeTimer.current)
+    }, [])
+
+
+return (
+    <>
+     <button
+      ref={triggerRef}
+      onMouseEnter={openMenu}
+      onMouseLeave={scheduleClose}
+      onClick={() => setOpen((prev) => !prev)}
+      className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-[12px] hover:bg-background/10"
+     >
+        {item.label}
+        <LuChevronRight size={14} className="opacity-60" />
+     </button>
+
+     {open && createPortal(
+        <div 
+         ref={menuRef}
+         onMouseEnter={cancelClose}
+         onMouseLeave={scheduleClose}
+         className="fixed z-10000 w-48 rounded-lg border border-background/10 bg-background/10 p-1.5 text-background shadow-xl backdrop-blur-[5px]"
+         style={{
+            left: position.left,
+            top: position.top
+         }}
+        >
+            <MenuItems
+            items={item.items}
+            onClose={onClose}
+            onAction={onAction}
+            />
+            
+        </div>,
+        document.body
+     )}
+    </>
+)
+}
+
+
+//Menu item renderer 
+
+const MenuItems = ({ items, onClose, onAction }) => {
+    return items.map((item, index) => {
+        if (item.separator) {
+            return (
+                <div 
+                 key={index}
+                 className="my-1 border-t border-background/10"
+               />   
+            )
+        }
+
+        if (item.type === "submenu") {
+            return (
+                <div key={index}>
+                    <Submenu
+                     item={item}
+                     onClose={onClose}
+                     onAction={onAction}
+                    />
+                </div>
+            )
+        }
+
+        return (
+            <button
+             key={index}
+             className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-[12px] hover:bg-background/10"
+             onClick={() => {
+                if (item.type === "link") {
+                    window.open(item.href, "_blank", "noopener noreferrer")
+                    onClose()
+                    return
+                }
+
+                if (item.type === "action") {
+                    onAction?.(item.action)
+                    onClose()
+                }
+             }}  
+            >
+                {item.label}
+
+                {item.type === "link" && <LuExternalLink size={14} className="opacity-50" />}
+
+            </button>
+        )
+    })
+}
+
+
+// Main context menu 
+const DesktopContextMenu = ({ x, y, onClose, onAction }) => {
     return (
-        <div className="fixed z-50 w-52 rounded-lg border border-background/10 bg-background/10 text-background  shadow-xl backdrop-blur-[5px]"
-         style={{ left: x, top: y }}
+        <div
+         className="fixed z-50 w-52 rounded-lg border border-background/10 bg-background/10 text-background shadow-xl backdrop-blur-[5px] p-1.5"
+         style={{
+            left: x, top: y
+         }}
          onContextMenu={(e) => e.preventDefault()}
         >
-            {renderItems(menu)}
+            <MenuItems
+             items={menu}
+             onClose={onClose}
+             onAction={onAction}
+            />
         </div>
     )
 }
+
+
 
 export default DesktopContextMenu
