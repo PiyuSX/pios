@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { LuChevronRight, LuExternalLink } from "react-icons/lu"
 
+
 const menu = [
     {
         label: "New",
@@ -135,6 +136,10 @@ const Submenu = ({ item, onClose, onAction }) => {
     }, [])
 
 
+
+
+
+
 return (
     <>
      <button
@@ -223,6 +228,8 @@ const MenuItems = ({ items, onClose, onAction }) => {
         )
     })
 }
+
+ 
 
 
 // Main context menu 

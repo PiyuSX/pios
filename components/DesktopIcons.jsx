@@ -8,7 +8,11 @@ import DesktopIcon from "./DesktopIcon";
 const MIN_CELL_WIDTH = 100;
 const MIN_CELL_HEIGHT = 90;
 
+
 const DesktopIcons = () => {
+  const iconSize = useDesktopStore((state) => state.iconSize);
+
+
   const desktopItems = useDesktopStore((state) => state.desktopItems);
 
   const moveItems = useDesktopStore((state) => state.moveItems);
@@ -282,10 +286,11 @@ const DesktopIcons = () => {
           }}
           onClick={(e) => {
             e.stopPropagation();
-            handleSelect(item.id, e.ctrlKey);
+            handleSelect(item.id, e.ctrlKey)
           }}
         >
           <DesktopIcon
+            size={iconSize}
             item={item}
             selected={selectedId.includes(item.id)}
             onSelect={handleSelect}
