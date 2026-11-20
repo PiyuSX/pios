@@ -5,12 +5,10 @@ import useDesktopStore from "@/app/store/useDesktopStore";
 import DesktopIcon from "./DesktopIcon";
 
 
-const MIN_CELL_WIDTH = 100;
-const MIN_CELL_HEIGHT = 90;
-
 
 const DesktopIcons = () => {
   const iconSize = useDesktopStore((state) => state.iconSize);
+
 
 
   const desktopItems = useDesktopStore((state) => state.desktopItems);
@@ -91,11 +89,15 @@ const DesktopIcons = () => {
     const desktop = desktopRef.current;
     if (!desktop) return;
 
+    const minCellWidth = Math.max(100, iconSize.width + 54)
+    const minCellHeight = Math.max(90, iconSize.height + 44)
+
     const observer = new ResizeObserver((entries) => {
       const { width, height } = entries[0].contentRect;
 
-      const cols = Math.max(1, Math.floor(width / MIN_CELL_WIDTH));
-      const rows = Math.max(1, Math.floor(height / MIN_CELL_HEIGHT));
+
+      const cols = Math.max(1, Math.floor(width / minCellWidth));
+      const rows = Math.max(1, Math.floor(height / minCellHeight));
 
       setGrid({
         rows,
@@ -108,7 +110,7 @@ const DesktopIcons = () => {
     observer.observe(desktop);
 
     return () => observer.disconnect();
-  }, []);
+  }, [iconSize.width, iconSize.height]);
 
   const handleSelect = (id, multiSelect) => {
     if (supressClick.current) {
