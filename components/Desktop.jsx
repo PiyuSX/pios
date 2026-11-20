@@ -24,6 +24,26 @@ const Desktop = ({ setCurrentScreen }) => {
     window.addEventListener("resize", closeMenu)
   },[])
 
+
+  const handleMenuAction = (action) => {
+    switch (action) {
+      case "new-folder":
+        //Adding later
+        break
+      case "new-file":
+        //Adding later
+        break
+      case "refresh":
+        //Adding later
+        break
+      case "display-settings":
+        //Adding later
+        break
+      default:
+        break
+    }
+  }
+
   
   return (
     <div 
@@ -47,6 +67,7 @@ const Desktop = ({ setCurrentScreen }) => {
            x={contextMenu.x}
            y={contextMenu.y}
            onClose={() => setContextMenu(null)}
+           onAction={handleMenuAction}
           />
         )}
     </div>

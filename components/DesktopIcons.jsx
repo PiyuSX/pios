@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import useDesktopStore from "@/app/store/useDesktopStore";
 import DesktopIcon from "./DesktopIcon";
 
+
 const MIN_CELL_WIDTH = 100;
 const MIN_CELL_HEIGHT = 90;
 
