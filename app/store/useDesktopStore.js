@@ -189,6 +189,14 @@ const useDesktopStore = create(
         (set, get) => ({
             desktopItems: defaultItems,
 
+            //Icon resizing 
+            desktopItems: defaultItems,
+
+            iconSize: { width: 46, height: 46 },
+
+            setIconSize: (size) => set({ iconSize: size }),
+
+
             //To add new file or folder
             addItem: (filename, type, rows, cols) => {
                 const items = get().desktopItems

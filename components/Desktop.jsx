@@ -3,9 +3,12 @@ import TopBar from "./TopBar";
 import DesktopIcons from "./DesktopIcons"
 import { useState, useEffect } from "react"
 import DesktopContextMenu from "./DesktopContextMenu";
+import useDesktopStore from "@/app/store/useDesktopStore";
 
 const Desktop = ({ setCurrentScreen }) => {
   const [contextMenu, setContextMenu] = useState(null)
+
+  const setIconSize = useDesktopStore((state) => state.setIconSize)
 
   const handleContextMenu = (e) => {
     e.preventDefault()
@@ -27,17 +30,16 @@ const Desktop = ({ setCurrentScreen }) => {
 
   const handleMenuAction = (action) => {
     switch (action) {
-      case "new-folder":
-        //Adding later
+      case "large-icons":
+        setIconSize({ width: 56, height: 56 })
         break
-      case "new-file":
-        //Adding later
+      case "small-icons":
+        setIconSize({ width: 36, height: 36 })
         break
-      case "refresh":
-        //Adding later
+      case "medium-icons":
+        setIconSize({ width: 46, height: 46 })
         break
-      case "display-settings":
-        //Adding later
+      case "auto-arrange":
         break
       default:
         break
