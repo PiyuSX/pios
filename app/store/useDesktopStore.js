@@ -7,181 +7,11 @@ const defaultItems = [
         filename: "Documents",
         icon: "/folder.svg",
         type: "folder",
-        isSystem: false,
-        row: 4,
-        col: 0
-    },
-    {
-        id: "test-file-4",
-        filename: "Notes",
-        icon: "/document.svg",
-        type: "file",
-        isSystem: false,
-        row: 5,
-        col: 0
-    },
-    {
-        id: "test-folder-6",
-        filename: "Downloads",
-        icon: "/folder.svg",
-        type: "folder",
-        isSystem: false,
-        row: 6,
-        col: 0
-    },
-    {
-        id: "test-file-5",
-        filename: "Resume",
-        icon: "/document.svg",
-        type: "file",
-        isSystem: false,
-        row: 7,
-        col: 0
-    },
-    {
-        id: "test-file-6",
-        filename: "Budget",
-        icon: "/document.svg",
-        type: "file",
-        isSystem: false,
-        row: 8,
-        col: 0
-    },
-    {
-        id: "test-folder-7",
-        filename: "Music",
-        icon: "/folder.svg",
-        type: "folder",
-        isSystem: false,
-        row: 2,
-        col: 1
-    },
-    {
-        id: "test-file-7",
-        filename: "Todo",
-        icon: "/document.svg",
-        type: "file",
-        isSystem: false,
-        row: 3,
-        col: 1
-    },
-    {
-        id: "test-folder-8",
-        filename: "Videos",
-        icon: "/folder.svg",
-        type: "folder",
-        isSystem: false,
-        row: 4,
-        col: 1
-    },
-    {
-        id: "test-file-8",
-        filename: "Changelog",
-        icon: "/document.svg",
-        type: "file",
-        isSystem: false,
-        row: 5,
-        col: 1
-    },
-    {
-        id: "test-folder-9",
-        filename: "Archive",
-        icon: "/folder.svg",
-        type: "folder",
-        isSystem: false,
-        row: 6,
-        col: 1
-    },
-    {
-        id: "test-file-9",
-        filename: "Invoices",
-        icon: "/document.svg",
-        type: "file",
-        isSystem: false,
-        row: 7,
-        col: 1
-    },
-    {
-        id: "test-folder-10",
-        filename: "Backups",
-        icon: "/folder.svg",
-        type: "folder",
-        isSystem: false,
-        row: 8,
-        col: 1
-    },
-    {
-        id: "test-file-10",
-        filename: "Contracts",
-        icon: "/document.svg",
-        type: "file",
-        isSystem: false,
-        row: 9,
-        col: 1
-    },
-    {
-        id: "test-folder-11",
-        filename: "Photos",
-        icon: "/folder.svg",
-        type: "folder",
-        isSystem: false,
+        isSystem: true,
         row: 0,
-        col: 2
+        col: 0
     },
-    {
-        id: "test-file-11",
-        filename: "Ideas",
-        icon: "/document.svg",
-        type: "file",
-        isSystem: false,
-        row: 1,
-        col: 2
-    },
-    {
-        id: "test-folder-12",
-        filename: "Work",
-        icon: "/folder.svg",
-        type: "folder",
-        isSystem: false,
-        row: 2,
-        col: 2
-    },
-    {
-        id: "test-file-12",
-        filename: "Meeting Notes",
-        icon: "/document.svg",
-        type: "file",
-        isSystem: false,
-        row: 3,
-        col: 2
-    },
-    {
-        id: "test-folder-13",
-        filename: "Personal",
-        icon: "/folder.svg",
-        type: "folder",
-        isSystem: false,
-        row: 4,
-        col: 2
-    },
-    {
-        id: "test-file-13",
-        filename: "Schedule",
-        icon: "/document.svg",
-        type: "file",
-        isSystem: false,
-        row: 5,
-        col: 2
-    },
-    {
-        id: "test-folder-14",
-        filename: "Templates",
-        icon: "/folder.svg",
-        type: "folder",
-        isSystem: false,
-        row: 6,
-        col: 2
-    }
+
 ]
 
 const useDesktopStore = create(
@@ -248,7 +78,9 @@ const useDesktopStore = create(
 
             //Remove but only non system items
             removeItem: (id) => set((state) => ({
-                desktopItems: state.desktopItems.filter((item) => item.id !== id || item.isSystem)
+                desktopItems: state.desktopItems.filter(
+                    (item) => item.id !== id || item.isSystem
+                )
             })),
 
             //Rename | only user created files 
