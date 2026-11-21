@@ -7,7 +7,7 @@ import { LuChevronRight, LuExternalLink } from "react-icons/lu"
 
 const menu = [
     {
-        label: "New",
+        label: "New Folder",
         type: "action",
         action: "new-folder"
     },

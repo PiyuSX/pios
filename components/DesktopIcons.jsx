@@ -6,7 +6,7 @@ import DesktopIcon from "./DesktopIcon";
 
 
 
-const DesktopIcons = () => {
+const DesktopIcons = ({ setGridSize, setGridInfo }) => {
   const iconSize = useDesktopStore((state) => state.iconSize);
 
 
@@ -105,6 +105,15 @@ const DesktopIcons = () => {
         cellWidth: width / cols,
         cellHeight: height / rows,
       });
+
+      setGridSize({ rows, cols })
+      setGridInfo({
+        rows,
+        cols,
+        cellWidth: width / cols,
+        cellHeight: height / rows,
+        rect: desktop.getBoundingClientRect()
+      })
     });
 
     observer.observe(desktop);

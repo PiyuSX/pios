@@ -198,31 +198,37 @@ const useDesktopStore = create(
 
 
             //To add new file or folder
-            addItem: (filename, type, rows, cols) => {
+            addItem: (filename, type, rows, cols, preferredRow, preferredCol) => {
                 const items = get().desktopItems
 
-                let row = 0
-                let col = 0
-                let found = false
+                if (rows <= 0 || cols <=0 ) return
+
+                let bestPosition = null
+                let minDistance = Infinity
 
                 //Finding the next avilavle grid position
 
-                for (let c = 0; c < cols && ! found; c++) {
+                for (let c = 0; c < cols ; c++) {
                     for (let r = 0; r < rows ; r++) {
                         const occupied = items.some(
                             (item) => item.row === r && item.col === c
                         )
 
-                        if (!occupied) {
-                            row = r
-                            col = c
-                            found = true
-                            break
+                        if (!occupied) continue
+
+
+                   //Calculates Manhattan distance to find closest avi grid cell
+                        const distance = Math.abs(r - preferredRow) + Math.abs(c - preferredCol)
+
+                        if (distance < minDistance) {
+                            minDistance = distance
+                            bestPosition = { row: r, col: c }
                         }
                     }
                 }
 
-                if (!found) return //No avilable position
+                if (!bestPosition) return
+
 
                 const newItem = {
                     id: crypto.randomUUID(),
@@ -230,8 +236,8 @@ const useDesktopStore = create(
                     icon: type === "folder" ? "/folder.svg" : `/${type}.svg`,
                     type,
                     isSystem: false,
-                    row,
-                    col
+                    row: bestPosition.row,
+                    col: bestPosition.col
                 }
 
                 set((state) => ({
@@ -364,6 +370,30 @@ const useDesktopStore = create(
 
             set({ desktopItems: updatedItems })
         
+        },
+
+        //Auto Arrange Icons
+        autoArrange: (rows, cols) => {
+            const items = get().desktopItems
+
+            const updatedItems = [...items]
+
+            let index = 0
+
+            for (let c = 0; c < cols; c++) {
+                for (let r = 0; r < rows; r++) {
+                    if (index >= items.length) break
+
+                    updatedItems[index] = {
+                        ...items[index],
+                        row: r,
+                        col: c
+                    }
+
+                    index++
+                }
+            }
+            set({ desktopItems: updatedItems })
         },
 
             //Restore default icons
