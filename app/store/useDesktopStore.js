@@ -187,7 +187,6 @@ const defaultItems = [
 const useDesktopStore = create(
     persist(
         (set, get) => ({
-            desktopItems: defaultItems,
 
             //Icon resizing 
             desktopItems: defaultItems,
@@ -214,7 +213,7 @@ const useDesktopStore = create(
                             (item) => item.row === r && item.col === c
                         )
 
-                        if (!occupied) continue
+                        if (occupied) continue
 
 
                    //Calculates Manhattan distance to find closest avi grid cell
