@@ -6,24 +6,31 @@ import DesktopIcon from "./DesktopIcon";
 
 
 
-const DesktopIcons = ({ setGridSize, setGridInfo }) => {
-  const iconSize = useDesktopStore((state) => state.iconSize);
+const DesktopIcons = ({ 
+  setGridSize,
+  setGridInfo,
+  selectedId,
+  setSelectedId,
+  renamingId,
+  onRename,
+  onCancelRename
 
+}) => {
+  const iconSize = useDesktopStore((state) => state.iconSize)
 
+  const desktopItems = useDesktopStore((state) => state.desktopItems)
 
-  const desktopItems = useDesktopStore((state) => state.desktopItems);
+  const moveItems = useDesktopStore((state) => state.moveItems)
 
-  const moveItems = useDesktopStore((state) => state.moveItems);
+  const [drag, setDrag] = useState(null)
 
-  const [drag, setDrag] = useState(null);
+  const dragStart = useRef(null)
 
-  const dragStart = useRef(null);
-
-  const supressClick = useRef(false);
+  const supressClick = useRef(false)
 
   //   const validatePosition = useDesktopStore((state) => state.validatePosition);
 
-  const desktopRef = useRef(null);
+  const desktopRef = useRef(null)
 
   const [grid, setGrid] = useState({
     rows: 0,
@@ -32,7 +39,6 @@ const DesktopIcons = ({ setGridSize, setGridInfo }) => {
     cellHeight: 0,
   });
 
-  const [selectedId, setSelectedId] = useState([]);
 
   const displayItems = (() => {
     if (!grid.rows || !grid.cols) return [];
@@ -86,8 +92,8 @@ const DesktopIcons = ({ setGridSize, setGridInfo }) => {
   })();
 
   useEffect(() => {
-    const desktop = desktopRef.current;
-    if (!desktop) return;
+    const desktop = desktopRef.current
+    if (!desktop) return
 
     const minCellWidth = Math.max(100, iconSize.width + 54)
     const minCellHeight = Math.max(90, iconSize.height + 44)
@@ -305,6 +311,9 @@ const DesktopIcons = ({ setGridSize, setGridInfo }) => {
             item={item}
             selected={selectedId.includes(item.id)}
             onSelect={handleSelect}
+            renaming={renamingId === item.id}
+            onRename={onRename}
+            onCancelRename={onCancelRename}
           />
         </div>
       ))}
