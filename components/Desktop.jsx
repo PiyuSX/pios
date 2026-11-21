@@ -6,6 +6,9 @@ import DesktopContextMenu from "./DesktopContextMenu";
 import useDesktopStore from "@/app/store/useDesktopStore";
 
 const Desktop = ({ setCurrentScreen }) => {
+
+  const [selectedId, setSelectedId] = useState([])
+
   const [contextMenu, setContextMenu] = useState(null)
 
   const setIconSize = useDesktopStore((state) => state.setIconSize)
@@ -18,6 +21,13 @@ const Desktop = ({ setCurrentScreen }) => {
 
   const addItem = useDesktopStore((state) => state.addItem)
 
+  const renameItem = useDesktopStore((state) => state.renameItem)
+
+  const [renamingId, setRenamingId] = useState(null)
+
+  const removeItem = useDesktopStore((state) => state.removeItem)
+
+
   
 
   const handleContextMenu = (e) => {
@@ -29,7 +39,17 @@ const Desktop = ({ setCurrentScreen }) => {
     })
   }
 
-  
+  const handleRename = (id, newName) => {
+    renameItem(id, newName)
+    setRenamingId(null)
+  }
+
+  const cancelRename = () => {
+    setRenamingId(null)
+  }
+
+
+
 
   useEffect(() => {
     const closeMenu = () => setContextMenu(null)
@@ -77,19 +97,10 @@ const Desktop = ({ setCurrentScreen }) => {
         autoArrangeIcons(gridSize.rows, gridSize.cols)
         break
       case "new-folder": {
-        console.log("New folder action triggered")
-        console.log("Grid info:", gridInfo)
-        console.log("Context menu position:", contextMenu)
-
-
+      
         const position = getPreferredPosition()
 
-        console.log("Preferred position:", position)
-
-        if (!position || !gridInfo) {
-          console.log("Missing grid info or position")
-          break
-        }
+        if (!position || !gridInfo) break
 
         addItem(
           "New Folder",
@@ -100,9 +111,9 @@ const Desktop = ({ setCurrentScreen }) => {
           position.col
         )
 
-        console.log("Add item called")
         break
       }
+
       case "new-file": {
         const position = getPreferredPosition()
 
@@ -116,6 +127,23 @@ const Desktop = ({ setCurrentScreen }) => {
           position.row,
           position.col
         )
+        break
+      }
+      case "rename": {
+
+        console.log("Rename clicked", selectedId)
+        if (selectedId.length !== 1) break
+
+        setRenamingId(selectedId[0])
+        break
+      }
+
+      case "delete": {
+        if (selectedId.length === 0) break
+
+        selectedId.forEach((id) => removeItem(id))
+        setSelectedId([])
+
         break
       }
       default:
@@ -137,8 +165,14 @@ const Desktop = ({ setCurrentScreen }) => {
             <TopBar setCurrentScreen={setCurrentScreen} />
           </div>
             <div className="relative flex-1 min-h-0 overflow-hidden">
-            <DesktopIcons setGridSize={setGridSize}
+            <DesktopIcons
+              setGridSize={setGridSize}
               setGridInfo={setGridInfo}
+              selectedId={selectedId}
+              setSelectedId={setSelectedId}
+              renamingId={renamingId}
+              onRename={handleRename}
+              onCancelRename={cancelRename}
             />
             </div>
             {/* Dock i will add it later */}
@@ -146,6 +180,7 @@ const Desktop = ({ setCurrentScreen }) => {
 
         {contextMenu && (
           <DesktopContextMenu
+           selectedId={selectedId}
            x={contextMenu.x}
            y={contextMenu.y}
            onClose={() => setContextMenu(null)}

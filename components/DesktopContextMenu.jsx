@@ -70,16 +70,26 @@ const menu = [
         separator: true
     },
     {
-        label: "Refresh",
-        type: "action",
-        action: "refresh"
-    },
-    {
         label: "Display Settings",
         type: "action",
         action: "display-settings"
     }
 ]
+
+const selectedMenu = [
+        {
+            label: "Rename",
+            type: "action",
+            action: "rename"
+        },
+        {
+            label: "Delete",
+            type: "action",
+            action: "delete"
+        }
+    ]
+
+
 
 
 const Submenu = ({ item, onClose, onAction }) => {
@@ -112,6 +122,8 @@ const Submenu = ({ item, onClose, onAction }) => {
 
         setOpen(true)
     }
+
+    
 
     //keeping the submuenu inside the viewport
 
@@ -233,7 +245,17 @@ const MenuItems = ({ items, onClose, onAction }) => {
 
 
 // Main context menu 
-const DesktopContextMenu = ({ x, y, onClose, onAction }) => {
+const DesktopContextMenu = ({ x, y, onClose, onAction, selectedId = [] }) => {
+
+    let currentMenu = menu
+
+    if (selectedId.length === 1) {
+        currentMenu = selectedMenu
+    }
+    if (selectedId.length > 1) {
+        currentMenu = selectedMenu.filter((item) => item.action === "delete")
+    }
+
     return (
         <div
          className="fixed z-50 w-52 rounded-lg border border-background/10 bg-background/10 text-background shadow-xl backdrop-blur-[5px] p-1.5"
@@ -243,7 +265,7 @@ const DesktopContextMenu = ({ x, y, onClose, onAction }) => {
          onContextMenu={(e) => e.preventDefault()}
         >
             <MenuItems
-             items={menu}
+             items={currentMenu}
              onClose={onClose}
              onAction={onAction}
             />
