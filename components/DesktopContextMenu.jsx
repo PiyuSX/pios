@@ -159,7 +159,7 @@ return (
       onMouseEnter={openMenu}
       onMouseLeave={scheduleClose}
       onClick={() => setOpen((prev) => !prev)}
-      className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-[12px] hover:bg-background/10"
+      className="flex w-full items-center  justify-between rounded-md px-3 py-2 text-left text-[12px] hover:bg-background/10"
      >
         {item.label}
         <LuChevronRight size={14} className="opacity-60" />
@@ -170,7 +170,7 @@ return (
          ref={menuRef}
          onMouseEnter={cancelClose}
          onMouseLeave={scheduleClose}
-         className="fixed z-10000 w-48 rounded-lg border border-background/10 bg-background/10 p-1.5 text-background shadow-xl backdrop-blur-[5px]"
+         className="fixed z-10000 w-48 rounded-lg border border-background/15 bg-background/10 p-1.5 text-background shadow-xl backdrop-blur-[5px]"
          style={{
             left: position.left,
             top: position.top

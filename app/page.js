@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import useDisableContextMenu from "./hooks/useDisableContextMenu";
 import { AnimatePresence, motion } from "framer-motion";
 import useHasSeenBoot from "./store/useBootStore";
+import NotificationFloater from "@/components/NotificationFloater";
 
 export default function Home() {
   useDisableContextMenu();
@@ -59,6 +60,7 @@ export default function Home() {
           )}
         </AnimatePresence>
       )}
+      <NotificationFloater />
     </div>
   );
 }

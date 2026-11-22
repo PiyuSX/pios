@@ -4,6 +4,7 @@ import DesktopIcons from "./DesktopIcons"
 import { useState, useEffect } from "react"
 import DesktopContextMenu from "./DesktopContextMenu";
 import useDesktopStore from "@/app/store/useDesktopStore";
+import { notify } from "@/app/store/useNotificationStore";
 
 const Desktop = ({ setCurrentScreen }) => {
 
@@ -139,7 +140,12 @@ const Desktop = ({ setCurrentScreen }) => {
       }
 
       case "delete": {
-        if (selectedId.length === 0) break
+        const items = useDesktopStore.getState().desktopItems
+
+        if (selectedId.some(id => items.find(item => item.id === id)?.isSystem)) {
+          notify("System", "Twin You can't delete my Stuff! 😼")
+        }
+        
 
         selectedId.forEach((id) => removeItem(id))
         setSelectedId([])
