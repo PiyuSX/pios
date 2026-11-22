@@ -321,4 +321,4 @@ const DesktopIcons = ({
   );
 };
 
-export default DesktopIcons;
+export default DesktopIcons

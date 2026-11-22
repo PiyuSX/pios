@@ -143,7 +143,7 @@ const Desktop = ({ setCurrentScreen }) => {
         const items = useDesktopStore.getState().desktopItems
 
         if (selectedId.some(id => items.find(item => item.id === id)?.isSystem)) {
-          notify("System", "Twin You can't delete my Stuff! 😼")
+          notify("System", "Twin You can't delete my Stuff! 😼", "3000")
         }
         
 

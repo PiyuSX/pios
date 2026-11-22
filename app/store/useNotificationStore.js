@@ -26,13 +26,14 @@ const useNotificationStore = create((set) => ({
 
 
 //Making it easy to useee
-export const notify = (heading, message, duration = 3500) => {
+export const notify = (heading, message, duration = 3500, soundName = "meow.wav" ) => {
     useNotificationStore.getState().addNotification({
         id: crypto.randomUUID(),
         heading,
         message,
         duration,
-        shown: false
+        shown: false,
+        soundName
     })
 }
 

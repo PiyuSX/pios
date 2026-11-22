@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import useNotificationStore from '@/app/store/useNotificationStore'
+import { motion, AnimatePresence } from "motion/react"
 
 const NotificationFloater = () => {
   const notifications =  useNotificationStore((state) => state.notifications)
@@ -19,6 +20,12 @@ const NotificationFloater = () => {
 
     if (nextNotification) {
       setActiveNotification(nextNotification)
+
+      if (nextNotification.soundName) {
+        const audio = new Audio(`/sounds/${nextNotification.soundName}`)
+        audio.volume = 0.8
+        audio.play().catch(() => {})
+      }
       markAsShown(nextNotification.id)
     }
   }, [notifications, activeNotification, markAsShown])
@@ -39,12 +46,20 @@ const NotificationFloater = () => {
 
   return (
     <div className="z-99999 fixed right-15 top-15 text-background">
+      <AnimatePresence mode="wait">
       {activeNotification && (
-        <div className="w-80 rounded-xl p-4 shadow-lg bg-background/10 border border-background/15  backdrop-blur-[5px]">
+        <motion.div
+        key={activeNotification.id}
+        initial={{opacity: 0, x: 40}}
+        animate={{opacity: 1, x: 0}}
+        exit={{opacity:0, x: 40}}
+        transition={{duration: 0.3, ease: "easeOut"}}
+        className="w-80 rounded-xl p-4 shadow-lg bg-background/10 border border-background/15  backdrop-blur-[5px]">
           <h2 className='text-lg font-semibold'>{activeNotification.heading}</h2>
           <p className='text-sm'>{activeNotification.message}</p>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   )
 }
