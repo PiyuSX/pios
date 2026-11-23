@@ -3,13 +3,14 @@ import { persist } from "zustand/middleware"
 
 const defaultItems = [
            {
-        id: "test-folder-5",
+        id: "test-file-5",
         filename: "Documents",
-        icon: "/folder.svg",
-        type: "folder",
+        icon: "/document.svg",
+        type: "document",
         isSystem: true,
         row: 0,
-        col: 0
+        col: 0,
+        content: "Hello Gng!"
     },
 
 ]
@@ -66,7 +67,8 @@ const useDesktopStore = create(
                     type,
                     isSystem: false,
                     row: bestPosition.row,
-                    col: bestPosition.col
+                    col: bestPosition.col,
+                    content: type === "file" ? "" : undefined
                 }
 
                 set((state) => ({
@@ -203,6 +205,21 @@ const useDesktopStore = create(
         
         },
 
+
+
+        //For files
+
+            getFileContent: (id) => {
+                const file = get().desktopItems.find((item) => item.id === id)
+                return file?.content ?? ""
+            },
+
+            updateFileContent: (id, newContent) => set((state) => ({
+                desktopItems: state.desktopItems.map((item) =>
+                  item.id === id ? { ...item, content } : item
+                )
+            })),
+
         //Auto Arrange Icons
         autoArrange: (rows, cols) => {
             const items = get().desktopItems
@@ -232,6 +249,8 @@ const useDesktopStore = create(
 
            
         }),
+
+        
         {
             name: "pios-desktop",
             version: 1

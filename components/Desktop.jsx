@@ -5,6 +5,8 @@ import { useState, useEffect } from "react"
 import DesktopContextMenu from "./DesktopContextMenu";
 import useDesktopStore from "@/app/store/useDesktopStore";
 import { notify } from "@/app/store/useNotificationStore";
+import WindowManager from "./windows/WindowManager";
+import useWindowStore from "@/app/store/useWindowStore";
 
 const Desktop = ({ setCurrentScreen }) => {
 
@@ -27,6 +29,13 @@ const Desktop = ({ setCurrentScreen }) => {
   const [renamingId, setRenamingId] = useState(null)
 
   const removeItem = useDesktopStore((state) => state.removeItem)
+
+
+
+
+  //Testing 
+  const openApp = useWindowStore((state) => state.openApp)
+
 
 
   
@@ -193,6 +202,13 @@ const Desktop = ({ setCurrentScreen }) => {
            onAction={handleMenuAction}
           />
         )}
+
+        <WindowManager />
+
+        <button className="z-99999 absolute top-100 left-100" onClick={() => openApp("text-editor", {fileId: "test-file-5"})}>
+          Open TextEditor
+        </button>
+        
     </div>
   )
 }
