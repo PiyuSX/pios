@@ -216,7 +216,8 @@ const useDesktopStore = create(
 
             updateFileContent: (id, newContent) => set((state) => ({
                 desktopItems: state.desktopItems.map((item) =>
-                  item.id === id ? { ...item, content } : item
+                  item.id === id 
+                   ? { ...item, content: newContent } : item
                 )
             })),
 

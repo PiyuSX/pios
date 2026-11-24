@@ -33,11 +33,6 @@ const Desktop = ({ setCurrentScreen }) => {
 
 
 
-  //Testing 
-  const openApp = useWindowStore((state) => state.openApp)
-
-
-
   
 
   const handleContextMenu = (e) => {
@@ -206,11 +201,6 @@ const Desktop = ({ setCurrentScreen }) => {
         )}
 
         <WindowManager />
-
-        <button className="z-99999 absolute top-100 left-100" onClick={() => openApp("text-editor", {fileId: "test-file-5"})}>
-          Open TextEditor
-        </button>
-        
     </div>
   )
 }
