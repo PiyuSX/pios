@@ -215,10 +215,13 @@ const useDesktopStore = create(
             },
 
             updateFileContent: (id, newContent) => set((state) => ({
-                desktopItems: state.desktopItems.map((item) =>
-                  item.id === id 
-                   ? { ...item, content: newContent } : item
-                )
+                desktopItems: state.desktopItems.map((item) =>{
+
+                  if (item.id !== id) return item
+                  if (item.isSystem) return item
+
+                  return { ...item, content: newContent }
+            })
             })),
 
         //Auto Arrange Icons

@@ -21,12 +21,23 @@ const TextEditor = ({ fileId, onRegisterClose }) => {
 
   const [warned, setWarned] = useState(false)
 
+  const [readOnlyWarned, setReadOnlyWarned] = useState(false)
+
+
+  const handleReadOnly = () => {
+    if (file.isSystem && !readOnlyWarned) {
+      notify("Sigma Editor", "Mate you can only read my file, create another file if you wanna write!😹", 4000)
+      setReadOnlyWarned(true)
+    }
+  }
+
 
 
   useEffect(() => {
     setContent(file?.content ?? "")
     setSaved(true)
     setWarned(false)
+    setReadOnlyWarned(false)
   }, [fileId])
 
 
@@ -98,9 +109,12 @@ const TextEditor = ({ fileId, onRegisterClose }) => {
       <textarea
         value={content}
         onChange={handleChange}
+        onKeyDown={handleReadOnly}
         placeholder='Start typing...'
         spellCheck={false}
-        className="min-h-0 flex-1 resize-none bg-background p-5 font-mono text-sm leading-7 outline-none cursor-text pointer-events-auto"
+        className={`min-h-0 flex-1 resize-none bg-background p-5 font-mono text-sm leading-7 outline-none cursor-text pointer-events-auto 
+           ${file.isSystem ? "cursor-not-allowed" : "cursor-text"}
+          `}
       />
 
         <div className="flex justify-between px-4 py-2 text-xs text-muted">

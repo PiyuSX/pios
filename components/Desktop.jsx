@@ -6,7 +6,7 @@ import DesktopContextMenu from "./DesktopContextMenu";
 import useDesktopStore from "@/app/store/useDesktopStore";
 import { notify } from "@/app/store/useNotificationStore";
 import WindowManager from "./windows/WindowManager";
-import useWindowStore from "@/app/store/useWindowStore";
+import Dock from "./Dock";
 
 const Desktop = ({ setCurrentScreen }) => {
 
@@ -125,8 +125,8 @@ const Desktop = ({ setCurrentScreen }) => {
         if (!position || !gridInfo) break
 
         addItem(
-          "New File",
-          "document",
+          "newfile.txt",
+          "file",
           gridInfo.rows,
           gridInfo.cols,
           position.row,
@@ -187,7 +187,7 @@ const Desktop = ({ setCurrentScreen }) => {
               onCancelRename={cancelRename}
             />
             </div>
-            {/* Dock i will add it later */}
+            <Dock />
         </div>
 
         {contextMenu && (
@@ -199,7 +199,7 @@ const Desktop = ({ setCurrentScreen }) => {
            onAction={handleMenuAction}
           />
         )}
-
+        
         <WindowManager />
     </div>
   )

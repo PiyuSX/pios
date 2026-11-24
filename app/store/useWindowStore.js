@@ -63,7 +63,21 @@ const useWindowStore = create(
 
     bringFront: (id) => set({
         focusedWindowId: id
-    })
+    }),
+
+    minimizeWindow: (id) => set((state) => ({
+        windows: state.windows.map((window) =>
+         window.id === id ? {...window, minimized: true } : window
+        ),
+        focusedWindowId: state.focusedWindowId === id ? null : state.focusedWindowId
+    })),
+
+    restoreWindow: (id) => set((state) => ({
+        windows: state.windows.map((window) =>
+         window.id === id ? {...window, minimized: false} : window
+        ),
+        focusedWindowId: id
+    }))
 }),
 {
     name: "pios-windows"

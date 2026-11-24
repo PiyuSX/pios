@@ -20,7 +20,7 @@ const WindowManager = () => {
 
   return (
   <>
-    {windows.map((window) => {
+    {windows.filter((window) => !window.minimized).map((window) => {
       const App = apps[window.app]
 
       if (!App) return null
