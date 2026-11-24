@@ -1,13 +1,14 @@
-import React from 'react'
 import useDesktopStore from '@/app/store/useDesktopStore'
 
-const TextEditor = ({fileId = "test-file-5"}) => {
+const TextEditor = ({fileId}) => {
 
-    const content = useDesktopStore.getState().getFileContent(fileId)
+  const content = useDesktopStore((state) => 
+   state.desktopItems.find((item) => item.id === fileId)?.content ?? ""
+  )
 
     
   return (
-    <div>
+    <div className='p-4'>
         {content}
     </div>
   )

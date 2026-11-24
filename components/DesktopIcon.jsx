@@ -8,6 +8,7 @@ const DesktopIcon = ({
   renaming,
   onRename,
   onCancelRename,
+  onDoubleClick
 }) => {
   const [name, setName] = useState(item.filename);
   const inputRef = useRef(null);
@@ -55,6 +56,10 @@ const DesktopIcon = ({
 
   return (
     <div
+      onDoubleClick={() => {
+        console.log("Icon Double Clicked", item.filename)
+        onDoubleClick?.()
+      }}
       className={`flex w-22.5 flex-col items-center gap-2 cursor-pointer select-none rounded-xl p-1 
       ${selected ? "bg-white/20 ring-1 ring-white/30" : "hover:bg-white/10"}
     `}

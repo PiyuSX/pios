@@ -86,6 +86,11 @@ const selectedMenu = [
             label: "Delete",
             type: "action",
             action: "delete"
+        },
+        {
+            label: "Open",
+            type: "action",
+            action: "open"
         }
     ]
 

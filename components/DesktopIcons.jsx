@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import useDesktopStore from "@/app/store/useDesktopStore";
 import DesktopIcon from "./DesktopIcon";
+import useWindowStore from "@/app/store/useWindowStore"
 
 
 
@@ -27,6 +28,8 @@ const DesktopIcons = ({
   const dragStart = useRef(null)
 
   const supressClick = useRef(false)
+
+  const openFile = useWindowStore((state) => state.openFile)
 
   //   const validatePosition = useDesktopStore((state) => state.validatePosition);
 
@@ -180,7 +183,7 @@ const DesktopIcons = ({
 
     dragStart.current = start;
 
-    e.currentTarget.setPointerCapture(e.pointerId);
+    // e.currentTarget.setPointerCapture(e.pointerId);
   };
 
   const handleDragMove = (e) => {
@@ -195,6 +198,11 @@ const DesktopIcons = ({
     // Ignoring small movement
 
     if (distance < 5 && !start.moved) return;
+
+    //Capture pointer only when actual dragging starts
+    if (!start.moved) {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    }
 
     if (!start.moved && !start.wasSelected) {
       setSelectedId([start.id]);
@@ -265,6 +273,15 @@ const DesktopIcons = ({
     setDrag(null);
   };
 
+
+  const handleOpenFile = (item) => {
+    console.log("Handle Open", item)
+
+    if (item.type !== "file") return
+
+    openFile(item)
+  }
+
   //   useEffect(() => {
   //     if (!grid.rows || !grid.cols) return;
 
@@ -314,6 +331,7 @@ const DesktopIcons = ({
             renaming={renamingId === item.id}
             onRename={onRename}
             onCancelRename={onCancelRename}
+            onDoubleClick={() => handleOpenFile(item)}
           />
         </div>
       ))}
@@ -322,3 +340,4 @@ const DesktopIcons = ({
 };
 
 export default DesktopIcons
+

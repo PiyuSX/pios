@@ -140,8 +140,6 @@ const Desktop = ({ setCurrentScreen }) => {
         break
       }
       case "rename": {
-
-        console.log("Rename clicked", selectedId)
         if (selectedId.length !== 1) break
 
         setRenamingId(selectedId[0])
@@ -159,6 +157,10 @@ const Desktop = ({ setCurrentScreen }) => {
         selectedId.forEach((id) => removeItem(id))
         setSelectedId([])
 
+        break
+      }
+
+      case "open": {
         break
       }
       default:

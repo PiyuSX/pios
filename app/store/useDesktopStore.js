@@ -4,9 +4,9 @@ import { persist } from "zustand/middleware"
 const defaultItems = [
            {
         id: "test-file-5",
-        filename: "Documents",
-        icon: "/document.svg",
-        type: "document",
+        filename: "notes.txt",
+        icon: "/file.svg",
+        type: "file",
         isSystem: true,
         row: 0,
         col: 0,
