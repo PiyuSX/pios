@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import useDesktopStore from "@/app/store/useDesktopStore";
 import DesktopIcon from "./DesktopIcon";
 import useWindowStore from "@/app/store/useWindowStore"
+import { createPortal } from "react-dom"
 
 
 
@@ -104,23 +105,34 @@ const DesktopIcons = ({
     const observer = new ResizeObserver((entries) => {
       const { width, height } = entries[0].contentRect;
 
+      if (width <= 0 || height <= 0) return
 
+
+      // const dockSpace = iconSize.height === 36 ? 115 : iconSize.height === 46 ? 270 : 370
+      const dockSpace = iconSize.height - 15
+      const availableHeight = height - dockSpace
+
+      const rows = Math.max(1, Math.floor(availableHeight / minCellHeight));
       const cols = Math.max(1, Math.floor(width / minCellWidth));
-      const rows = Math.max(1, Math.floor(height / minCellHeight));
+
+
+      const cellWidth = width / cols
+      const cellHeight = availableHeight / rows
+
 
       setGrid({
         rows,
         cols,
-        cellWidth: width / cols,
-        cellHeight: height / rows,
+        cellWidth,
+        cellHeight
       });
 
       setGridSize({ rows, cols })
       setGridInfo({
         rows,
         cols,
-        cellWidth: width / cols,
-        cellHeight: height / rows,
+        cellWidth,
+        cellHeight,
         rect: desktop.getBoundingClientRect()
       })
     });
@@ -163,6 +175,9 @@ const DesktopIcons = ({
       pointerId: e.pointerId,
       initialLeft: rect.left - desktopRect.left,
       initialTop: rect.top - desktopRect.top,
+
+      desktopLeft: desktopRect.left,
+      desktopTop: desktopRect.top,
 
       startX: e.clientX,
       startY: e.clientY,
@@ -218,6 +233,8 @@ const DesktopIcons = ({
       group: start.group,
       deltaX,
       deltaY,
+      desktopLeft: start.desktopLeft,
+      desktopTop: start.desktopTop
     });
   };
 
@@ -291,53 +308,104 @@ const DesktopIcons = ({
   return (
     <div
       ref={desktopRef}
-      className="absolute inset-0"
+      className="absolute inset-8"
       onClick={() => setSelectedId([])}
     >
       {displayItems.map((item) => (
         <div
-          key={item.id}
-          className="absolute flex items-center justify-center"
-          onPointerDown={(e) => handleDragStart(e, item)}
-          onPointerMove={handleDragMove}
-          onPointerUp={handleDragEnd}
-          onPointerCancel={handleDragEnd}
-          style={{
-            left: drag?.ids.includes(item.id)
-              ? drag.group.find((i) => i.id === item.id).col * grid.cellWidth +
-                drag.deltaX
-              : item.displayCol * grid.cellWidth,
+         key={item.id}
+         className="absolute flex items-center justify-center"
+         onPointerDown={(e) => handleDragStart(e, item)}
+         onPointerMove={handleDragMove}
+         onPointerUp={handleDragEnd}
+         onPointerCancel={handleDragEnd}
+         
+         style={{
+          left: drag?.ids.includes(item.id)
+          ? drag.group.find((i) => i.id === item.id).col * grid.cellWidth +
+            drag.deltaX
+          : item.displayCol * grid.cellWidth,
 
-            top: drag?.ids.includes(item.id)
-              ? drag.group.find((i) => i.id === item.id).row * grid.cellHeight +
-                drag.deltaY
-              : item.displayRow * grid.cellHeight,
+          top: drag?.ids.includes(item.id)
+          ? drag.group.find((i) => i.id === item.id).row * grid.cellHeight +
+            drag.deltaY
+          : item.displayRow * grid.cellHeight,
 
-            width: grid.cellWidth,
-            height: grid.cellHeight,
-            zIndex: drag?.ids.includes(item.id) ? 10 : 0,
-            touchAction: "none",
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleSelect(item.id, e.ctrlKey)
-          }}
+          width: grid.cellWidth,
+          height: grid.cellHeight,
+          zIndex: 0,
+          opacity: drag?.ids.includes(item.id) ? 0 : 1,
+          touchAction: "none"
+         }}
+         onClick={(e) => {
+          e.stopPropagation()
+          handleSelect(item.id, e.ctrlKey)
+         }}
         >
           <DesktopIcon
-            size={iconSize}
-            item={item}
-            selected={selectedId.includes(item.id)}
-            onSelect={handleSelect}
-            renaming={renamingId === item.id}
-            onRename={onRename}
-            onCancelRename={onCancelRename}
-            onDoubleClick={() => handleOpenFile(item)}
+          size={iconSize}
+          item={item}
+          selected={selectedId.includes(item.id)}
+          onSelect={handleSelect}
+          renaming={renamingId === item.id}
+          onRename={onRename}
+          onCancelRename={onCancelRename}
+          onDoubleClick={() => handleOpenFile(item)}
           />
         </div>
       ))}
+    {/* Ts for the icons render above the Dock so it dont looks broken, like me */}
+
+    
+      {drag && createPortal(
+        <div className="fixed inset-0 z-9999 pointer-events-none">
+          {drag.group.map((draggedItem) => {
+            const item = displayItems.find(
+              (i) => i.id === draggedItem.id
+            )
+
+            if (!item) return null
+
+           return (
+            <div
+             key={item.id}
+             className="absolute flex items-center justify-center"
+             style={{
+              left:
+                drag.desktopLeft + 
+                draggedItem.col * grid.cellWidth + 
+                drag.deltaX,
+
+              
+              top:
+                drag.desktopTop + 
+                draggedItem.row * grid.cellHeight + 
+                drag.deltaY,
+              width: grid.cellWidth,
+              height: grid.cellHeight
+             }}
+            >
+              <DesktopIcon
+                size={iconSize}
+                item={item}
+                selected={selectedId.includes(item.id)}
+                onSelect={handleSelect}
+                renaming={renamingId === item.id}
+                onRename={onRename}
+                onCancelRename={onCancelRename}
+                onDoubleClick={() => handleOpenFile(item)}
+              />
+
+            </div>
+           )
+          })}
+        </div>,
+        document.body
+      ) }
     </div>
-  );
-};
+  )
+}
 
 export default DesktopIcons
+
 

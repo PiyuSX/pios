@@ -32,7 +32,6 @@ const Desktop = ({ setCurrentScreen }) => {
 
 
 
-
   
 
   const handleContextMenu = (e) => {
@@ -187,8 +186,10 @@ const Desktop = ({ setCurrentScreen }) => {
               onCancelRename={cancelRename}
             />
             </div>
-            <div className="absolute bottom-3 left-0 right-0 z-10 pointer-events-none">
+            <div className="absolute bottom-4  left-0 right-0 z-10 pointer-events-none">
+              <div className="pointer-events-auto">
             <Dock />
+              </div>
             </div>
         </div>
 
