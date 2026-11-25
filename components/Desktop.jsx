@@ -187,7 +187,9 @@ const Desktop = ({ setCurrentScreen }) => {
               onCancelRename={cancelRename}
             />
             </div>
+            <div className="absolute bottom-3 left-0 right-0 z-10 pointer-events-none">
             <Dock />
+            </div>
         </div>
 
         {contextMenu && (

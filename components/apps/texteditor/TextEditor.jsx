@@ -26,7 +26,7 @@ const TextEditor = ({ fileId, onRegisterClose }) => {
 
   const handleReadOnly = () => {
     if (file.isSystem && !readOnlyWarned) {
-      notify("Sigma Editor", "Mate you can only read my file, create another file if you wanna write!😹", 4000)
+      notify("Sigma Editor", "My file is read-only! Make a new one to write, and please leave a feedback in Comment Folder. 😹", 6000)
       setReadOnlyWarned(true)
     }
   }
@@ -55,7 +55,7 @@ const TextEditor = ({ fileId, onRegisterClose }) => {
 
 
   const handleClose = () => {
-    if (!saved && !warned) {
+    if (!saved && !warned && !file.isSystem) {
       notify("Sigma Editor", "Mate it , it will get lost 😿 Save it!")
       setWarned(true)
       return false
