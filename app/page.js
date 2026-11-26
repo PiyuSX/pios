@@ -8,6 +8,7 @@ import useDisableContextMenu from "./hooks/useDisableContextMenu";
 import { AnimatePresence, motion } from "framer-motion";
 import useHasSeenBoot from "./store/useBootStore";
 import NotificationFloater from "@/components/NotificationFloater";
+import FilesystemTest from "@/components/FilesystemTest";
 
 export default function Home() {
   useDisableContextMenu();
@@ -61,6 +62,7 @@ export default function Home() {
         </AnimatePresence>
       )}
       <NotificationFloater />
+      <FilesystemTest />
     </div>
   );
 }
