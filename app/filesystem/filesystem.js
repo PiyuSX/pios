@@ -356,3 +356,287 @@ export const updateFileContent = async (fileId, newContent) => {
 
 
 
+export const renameEntry = async (entryId, newName) => {
+    const db = await openDatabase()
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction("entries", "readwrite")
+        const store = transaction.objectStore("entries")
+
+        const request = store.getAll()
+        let error = null
+        let renameEntry = null
+
+        request.onsuccess = () => {
+            const entries = request.result
+
+            const entry = entries.find(
+                (item) => item.id === entryId
+            )
+
+            if (!entry) {
+                error = new Error("Entry not found")
+                transaction.abort()
+                return
+            }
+
+            if (entry.system) {
+                error = new Error("Cannot rename Admin's entry")
+                transaction.abort()
+                return
+            }
+
+            const name = newName.trim()
+
+            if (!name) {
+                error = new Error("Name cannot be empty")
+                transaction.abort()
+                return
+            }
+
+            const duplicate = entries.some(
+                (item) => 
+                    item.id !== entryId &&
+                item.parentId === entry.parentId &&
+                item.name.toLowerCase() === name.toLowerCase()
+            )
+
+            if (duplicate) {
+                error = new Error("An entry with this name already exists")
+                transaction.abort()
+                return
+            }
+
+            entry.name = name
+            entry.updatedAt = Date.now()
+
+            store.put(entry)
+            renameEntry = entry
+        }
+
+        request.onerror = () => {
+            db.close()
+            reject(request.error)
+        }
+
+        transaction.oncomplete = () => {
+            db.close()
+            resolve(renameEntry)
+        }
+
+        transaction.onabort = () => {
+            db.close()
+            reject(error || transaction.error)
+        }
+
+        transaction.onerror = () => {
+            db.close()
+            reject(transaction.error)
+        }
+    })
+}
+
+
+export const moveEntry = async (entryId, newParentId) => {
+    const db = await openDatabase()
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction("entries", "readwrite")
+        const store = transaction.objectStore("entries")
+        const request = store.getAll()
+
+        let error = null
+        let movedEntry = null
+
+        request.onsuccess = () => {
+            const entries = request.result
+
+            const entry = entries.find(
+                (item) => item.id === entryId
+
+            )
+
+            const destination = entries.find(
+                (item) => item.id === newParentId
+            )
+            
+            if (!entry) {
+                error = new Error("Entry not found")
+                transaction.abort()
+                return
+            }
+
+            if (entry.system) {
+                error = new Error("Cannot move Admin's entry")
+                transaction.abort()
+                return
+            }
+
+            if (!destination || destination.type !== "folder" || newParentId === ROOT_ID) {
+                error = new Error("Invalid destination folder")
+                transaction.abort()
+                return
+            } 
+
+            if (entry.parentId === newParentId) {
+                movedEntry = entry
+                return
+            }
+
+            //Preventing moving into self or its kids
+            let currentFolder = destination
+
+            while (currentFolder) {
+                if (currentFolder.id === entryId) {
+                    error = new Error("Cannot move a folder into itself")
+                    transaction.abort()
+                    return
+                }
+
+                currentFolder = entries.find(
+                    (item) => item.id === currentFolder.parentId
+                )
+            }
+
+            const duplicate = entries.some(
+                (item) =>
+                    item.parentId === newParentId &&
+                    item.name.toLowerCase() === entry.name.toLowerCase()
+            )
+
+            if (duplicate) {
+                error = new Error("An entry with this name already exists")
+                transaction.abort()
+                return
+            }
+
+            entry.parentId = newParentId
+            entry.updatedAt = Date.now()
+
+            store.put(entry)
+            movedEntry = entry
+        }
+
+        request.onerror = () => {
+            db.close()
+            reject(request.error)
+        }
+
+        transaction.oncomplete = () => {
+            db.close()
+            resolve(movedEntry)
+        }
+
+        transaction.onabort = () => {
+            db.close()
+            reject(error || transaction.error)
+        }
+
+        transaction.onerror = () => {
+            db.close()
+            reject(transaction.error)
+        }
+    })
+}
+
+
+
+export const deleteEntry = async (entryId) => {
+    const db = await openDatabase()
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            ["entries", "fileContents"],
+            "readwrite"
+        )
+
+        const entriesStore = transaction.objectStore("entries")
+        const contentStore = transaction.objectStore("fileContents")
+
+        const request = entriesStore.getAll()
+
+        let error = null
+        let deletedCount = 0
+
+        request.onsuccess = () => {
+            const entries = request.result
+
+            const entry = entries.find(
+                (item) => item.id === entryId
+            )
+
+            if (!entry) {
+                error = new Error("Entry not found")
+                transaction.abort()
+                return
+            }
+
+            if (entry.system) {
+                error = new Error("Cannot delete a system entry")
+                transaction.abort()
+                return
+            }
+
+            const entriesToDelete = [entry]
+            const visited = new Set([entry.id])
+
+            const collectEntries = (parentId) => {
+                const children = entries.filter(
+                    (item) => item.parentId === parentId
+                )
+
+                children.forEach((child) => {
+                    if (visited.has(child.id)) return
+
+                    visited.add(child.id)
+                    entriesToDelete.push(child)
+
+                    if (child.type === "folder") {
+                        collectEntries(child.id)
+                    }
+                })
+            }
+
+            if (entry.type === "folder") {
+                collectEntries(entry.id)
+            }
+
+            if (entriesToDelete.some((item) => item.system)) {
+                error = new Error(
+                    "Cannot delete a folder containing system entries"
+                )
+                transaction.abort()
+                return
+            }
+
+            entriesToDelete.forEach((item) => {
+                entriesStore.delete(item.id)
+                contentStore.delete(item.id)
+            })
+
+            deletedCount = entriesToDelete.length
+        }
+
+        request.onerror = () => {
+            error = request.error
+            transaction.abort()
+        }
+
+        transaction.oncomplete = () => {
+            db.close()
+            resolve(deletedCount)
+        }
+
+        transaction.onabort = () => {
+            db.close()
+            reject(error || transaction.error)
+        }
+
+        transaction.onerror = () => {
+            db.close()
+            reject(error || transaction.error)
+        }
+    })
+}
+
+
